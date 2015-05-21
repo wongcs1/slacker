@@ -1,8 +1,10 @@
 ## File not intended as valid json, vim's auto indentation doesn't work without the
-## .json extension
+## .json extension.
 ## response codes adhere to POSIX standard (0 for success)
+## Do we want second level elements grouping common sub elements? I like it as a style rule
 
-New Message Request JSON
+## Message write service requesting message be stored (Stephen/Tim)
+New Message Request
 {
   "new_msg": {
     "channel_id": 0,
@@ -12,9 +14,7 @@ New Message Request JSON
 }
 
 New Message Response
-
 Succeeded:
-
 {
   "new_msg_response": { 
     "response_code": 0,
@@ -23,7 +23,6 @@ Succeeded:
 }
 
 Failed:
-
 {
   "new_msg_response": {
     "response_code": 1,
@@ -31,17 +30,16 @@ Failed:
   }
 }
 
+## Message read service, requesting messages for clients (Ping)
 Read Request:
-
 {
   "msg_read_request": {
     "channel_id" :0,
     "offset": 323,   <-- Integer could either represent last message received by client, or
-  }                       next message client wants. (Will return all messages past supplied offset)
-}
+  }                       next message client wants. (Will return all messages past supplied offset),
+}                         
 
 Read Response:
-
 Succeeded:
 {
   "msg_read_response" : {
