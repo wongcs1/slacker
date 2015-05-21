@@ -18,7 +18,8 @@ Succeeded:
 {
   "new_msg_response": { 
     "response_code": 0,
-    "message_id": 0  <--- Do we need this?
+    "message_id": 0  <--- Do we need this? 
+                     Not sure, my logic was that the person might want to request the new message to see that it was added
   }
 }
 
@@ -67,7 +68,7 @@ Succeeded:
 Failed:
 {
   "msg_read_response": {
-    "response_code": 1,
+    "response_code": 0,
     "error_message": "<Error message>",
   }
 }
