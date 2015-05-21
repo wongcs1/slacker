@@ -1,0 +1,58 @@
+New Message Request JSON
+
+   {
+      channel_id: 0,
+      user_id: 0,
+      message_string: "<Message String>",
+   }
+
+New Message Response
+
+   Succeeded:
+
+      {
+         response_code: 0,
+         message_id: 0
+      }
+
+   Failed:
+
+      {
+         response_code: 1,
+         error_message: "<Error message>"
+      }
+
+Read Request:
+
+      {
+         
+      }
+
+Read Response:
+
+   Succeeded:
+
+      {
+         response_code: 0,
+
+         messages:   [
+                     {
+                        user_id: 0,
+                        channel_id: 0,
+                        time_stamp: 0,
+                        message_string: "<Message String>"
+                     },
+                     {
+                        user_id: 0,
+                        channel_id: 0,
+                        time_stamp: 0,
+                        message_string: "<Message String>"
+                     }
+                  ]
+      }
+
+   Failed:
+      {
+         response_code: 1,
+         errorMessage: "<Error message>"
+      }
