@@ -1,0 +1,55 @@
+# To request a new message be written to data store:
+{
+  "message": {
+    "channel_id": 0,
+    "user_id": 0,
+    "body": "message",
+    "timestamp": UnixTimeStamp
+  }
+}
+
+# Write response:
+# Success
+{
+  "new_msg_response": {
+    "response_code": 0,
+    "response_message": "Message entered successfully",
+    "message_id": 0
+  }
+}
+
+#Failure
+{
+  "new_msg_response": {
+    "response_code": 1,
+    "response_message": "failed"
+  }
+}
+
+
+# To get a message: Returns ALL messages in specified channel after supplied message_id
+http://host/messages?channel_id=1&message_id=2
+
+# Message response:
+# Successful
+{
+  "msg_read_response": {
+    "response_code": 0,
+  }
+  "messages": {
+    "user_id": 0,
+    "message_id": 0,
+    "channel_id": 0,
+    "time_stamp": 2341234,
+    "body": "hello bla bla"
+  }
+}
+
+# Failure
+{
+  "msg_read_response": {
+    "response_code": 0,
+    "error_message": "Failed etc etc"
+  }
+}
+
