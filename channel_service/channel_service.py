@@ -46,7 +46,7 @@ class ChannelWebService:
         return False
 
     def get_channel_json(self, channel_id):
-        channel = self.channel_db.find_one({"id": channel_id})
+        channel = self.channel_db.channels.find_one({"_id": channel_id})
 
         if channel is None:
             raise IndexError
@@ -62,3 +62,5 @@ if __name__ == '__main__':
             "tools.response_headers.headers": [("Content-Type", "application/json")]
             }
         }
+    cherrypy.config.update({'server.socket_port' : 8000})
+    cherrypy.quickstart(ChannelWebService(), '/', conf)

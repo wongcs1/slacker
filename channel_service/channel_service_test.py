@@ -11,7 +11,7 @@ class ChannelServiceTests(unittest.TestCase):
         self.heads = {'Content-Type' : 'application/json'}
 
         #Variable's for testing the get channel
-        self.valid_channel_id = 0
+        self.valid_channel_id = 1
         self.invalid_channel_id = 43453
 
         self.valid_new_channel_json = {}
@@ -20,8 +20,9 @@ class ChannelServiceTests(unittest.TestCase):
 
 
     def test_get_channel(self):
-        get_channel_response = requests.get('http://localhost:8080/?channel_id=0').json()
+        get_channel_response = requests.get('http://localhost:8000/?channel_id=' + str(self.valid_channel_id)).json()
+
 
     def test_add_channel(self):
-        add_channel_response = requests.post('http://localhost:8080/', headers=self.heads,
+        add_channel_response = requests.post('http://localhost:8000/', headers=self.heads,
                       data=json.dumps(self.valid_new_channel_json))
