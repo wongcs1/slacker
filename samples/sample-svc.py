@@ -53,5 +53,5 @@ if __name__ == '__main__':
 	    'tools.response_headers.headers': [('Content-Type', 'application/json')],
 	    }
 	  }
-
+    cherrypy.config.update({'server.socket_port' : 8000})
     cherrypy.quickstart(DataListWebService(), '/', conf)
