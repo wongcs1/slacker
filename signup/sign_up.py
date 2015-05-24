@@ -1,5 +1,9 @@
 import cherrypy
 import requests
+import sys
+lib_path = '..'
+sys.path.append(lib_path)
+import slacker_config
 
 # Author: Matt Ankerson
 # Date: 20 May 2015
@@ -53,4 +57,6 @@ if __name__ == "__main__":
             'tools.response_headers.headers': [('Content-Type', 'application/json')],
         }
     }
+    
+    cherrypy.config.update({'server.socket_port' : slacker_config.urls.port['signup']})
     cherrypy.quickstart(SignUpService(), '/', conf)
