@@ -1,0 +1,75 @@
+## File not intended as valid json, vim's auto indentation doesn't work without the
+## .json extension.
+## response codes adhere to POSIX standard (0 for success)
+## Do we want second level elements grouping common sub elements? I like it as a style rule
+
+## Message write service requesting message be stored (Stephen/Tim)
+New Message Request
+{
+  "new_msg": {
+    "channel_id": 0,
+    "user_id": 0,
+    "message_string": "<Message String>",
+  }
+}
+
+New Message Response
+Succeeded:
+{
+  "new_msg_response": { 
+    "response_code": 0,
+    "message_id": 0  <--- Do we need this? 
+                     Not sure, my logic was that the person might want to request the new message to see that it was added
+  }
+}
+
+Failed:
+{
+  "new_msg_response": {
+    "response_code": 1,
+    "error_message": "<Error message>"
+  }
+}
+
+## Message read service, requesting messages for clients (Ping)
+Read Request:
+{
+  "msg_read_request": {
+    "channel_id" :0,
+    "offset": 323,   <-- Integer could either represent last message received by client, or
+  }                       next message client wants. (Will return all messages past supplied offset),
+}                         
+
+Read Response:
+Succeeded:
+{
+  "msg_read_response" : {
+    "response_code": 1,
+    "error_message": "<Error message>",
+  }
+  "messages": [
+    {
+      "user_id": 0,
+      "channel_id": 0,
+      "time_stamp": 0,
+      "message_string": "<Message String>"
+      "offset": 2323   <-- Service should determine message offset, rather than rely on clients
+    },                      to offset messages
+    {
+      "user_id": 0,
+      "channel_id": 0,
+      "time_stamp": 0,
+      "message_string": "<Message String>",
+      "offset": 2345,
+    }
+  ]
+}
+
+Failed:
+{
+  "msg_read_response": {
+    "response_code": 0,
+    "error_message": "<Error message>",
+  }
+}
+
