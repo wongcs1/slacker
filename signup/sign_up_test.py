@@ -9,7 +9,7 @@ import json
 class SignUpTests(unittest.TestCase):
 
     def setUp(self):
-        self.service_url = "http://127.0.0.1:8080/"
+        self.service_url = "http://127.0.0.1:8002/"
         self.heads = {'Content-Type': 'application/json'}
 
         self.good_user = {'email': 'yogi@bear', 'password': 'yellowstone', 'screen_name': 'picnic_baskets'}

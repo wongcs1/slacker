@@ -42,7 +42,8 @@ class SignUpService(object):
 
         if proceed:
             heads = {'Content-Type': 'application/json'}
-            response = requests.post("url to user directory", headers=heads, data=new_user).json()
+            url = slacker_config.urls.url['user_directory'] + ':' + slacker_config.urls.port['user_directory']
+            response = requests.post(url, headers=heads, data=new_user).json()
         return response
 
 
@@ -52,7 +53,6 @@ if __name__ == "__main__":
     conf = {
         '/': {
             'request.dispatch': cherrypy.dispatch.MethodDispatcher(),
-            # 'tools.sessions.on': True,
             'tools.response_headers.on': True,
             'tools.response_headers.headers': [('Content-Type', 'application/json')],
         }
