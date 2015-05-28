@@ -3,16 +3,17 @@ __author__ = 'ping.dong'
 import cherrypy
 import httplib2 as http
 import json
-
 try:
     from urlparse import urlparse
 except ImportError:
     from urllib.parse import urlparse
 
+# Service endpoint define
 # TODO: Service Endpoint should retrieve dynamically
 auth_service_url = ''
 auth_key_param = '{"credential","{0}"}'
 auth_permission_param = '{"credential","{0}"}'
+
 msg_service_url = ''
 msg_read_param = '{"channel_id","{0}";"offset","{1}"}'
 
@@ -24,15 +25,15 @@ class MessageReadService:
 
     @cherrypy.tools.json_out()
     @cherrypy.tools.json_in()
-    def POST(self, credential, channel_id, offset):
+    def POST(self):
         try:
             # check argument
-            channel_id = int(channel_id)
-            offset = int(offset)
+            parameters = cherrypy.request.json
+            credential = paramters['key']
+            channel_id = int(parameters['channel_id'])
+            offset = int(parameters['offset'])
         except ValueError:
             return {'error': 'invalid data format'}
-
-        # Service endpoint define
 
         try:
             # authenticate
@@ -43,20 +44,21 @@ class MessageReadService:
             try:
                 if not self.str2bool(auth_result['valid']):
                     return {'error', 'unauthorized'}
-            except:
+            except:  # should capture more specific exception
                 return {'error', 'unauthorized'}
 
             # authorize
             #permission_param = auth_key_param.format(credential)
             #permission_response_content = self.call_rest_api(auth_service_url, permission_param)
             #permission = json.load(permission_response_content)
+            # check permission here
 
             # pass-through data
             msg_param = msg_read_param.format(channel_id, offset)
             msg_response_content = self.call_rest_api(msg_service_url, msg_param)
             msg = json.load(msg_response_content)
             return msg
-        except:
+        except: # should capture more specific exception
             return {'error': 'Unexpected error'}
 
     def str2bool(self, v):
