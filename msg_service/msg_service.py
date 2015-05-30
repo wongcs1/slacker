@@ -1,5 +1,5 @@
 import cherrypy
-from msg_service_dicts import msg_response
+from msg_service_dicts import msg_response, msg_store
 from bson.json_util import dumps
 from pymongo import MongoClient
 
@@ -22,45 +22,33 @@ class MessageService(object):
             msgs = self.mc.find({"message_id": {"$gt": int(message_id)}, 
                 "channel_id": int(channel_id)})
         except:
-            r_msg = "Cannot query database"
-            return msg_response(r_msg, 1)
+            return msg_response("Cannot query database", 1)
         else:
             if msgs.count() == 0:
-                 r_msg = "No messages match query"
-                 return msg_response(r_msg, 1)
+                 return msg_response("No messages match query", 1)
             else:
-                r_msg = "Messages returned successfully"
-                return msg_response(r_msg, 0, dumps(msgs))
+                return msg_response("Messages returned successfully", 0, dumps(msgs))
 
     @cherrypy.tools.json_in()
     @cherrypy.tools.json_out()
     def POST(self):
         """ Takes a new message store request, validates against channel service, validates json
-        contents, submits to database and responds. TODO: Refactor, implemented channel serv check"""
+        contents, submits to database and responds. TODO: Implement channel serv check"""
 
-        r_root = {"new_msg_response": {"response_code": 1, "response_message": "" }}
-        r_new = r_root["new_msg_response"]
+        req_dict = cherrypy.request.json
+        msg_dict = req_dict["message"]
 
-        root_dict = cherrypy.request.json
+        if not self.valid_json(req_dict):
+            r_msg = "JSON payload invalid"
+            return msg_store(r_msg, 1)
 
-        if self.valid_json(root_dict):
-            msg_dict = root_dict["message"]
-            # Crude way to number messages for now
-            new_id = self.mc.count({"channel_id": msg_dict["channel_id"]}) + 1
-            msg_dict["message_id"] = new_id
-            
-            try:
-                self.mc.insert_one(msg_dict)
-                r_new["response_code"] = 0
-                r_new["response_message"] = "Message entered sucessfully"
-                r_new["message_id"] = new_id
-
-            except:
-                r_new["response_message"] = "Error executing query"
+        try:
+            self.mc.insert_one(msg_dict)
+            new_id = self.mc.count({"channel_id": msg_dict["channel_id"]}) + 1  # crude
+        except:
+            return msg_store("Error executing query", 1)
         else:
-            r_new["response_message"] = "JSON Payload Invalid"
-
-        return r_root
+            return msg_store("Message enterred successfully", 0, new_id)
 
     @cherrypy.tools.json_in()
     @cherrypy.tools.json_out()
@@ -72,8 +60,8 @@ class MessageService(object):
     def DELETE(self):
         pass
 
-    # Just check to make sure all fields are present for now
     def valid_json(self, req_dict):
+        """ Checks all required fields present in message store request """
         if 'message' in req_dict:
             if all (k in req_dict['message'] for k in ("channel_id", "user_id", "body", "timestamp")):
                 return True
