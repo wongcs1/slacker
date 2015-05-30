@@ -1,4 +1,5 @@
 import cherrypy
+import requests
 from msg_service_dicts import msg_response, msg_store
 from bson.json_util import dumps
 from pymongo import MongoClient
@@ -38,7 +39,7 @@ class MessageService(object):
         req_dict = cherrypy.request.json
         msg_dict = req_dict["message"]
 
-        if not self.valid_json(req_dict):
+        if not self.valid_msg_json(req_dict):
             return msg_store("JSON payload invalid", 1)
 
         try:
@@ -57,18 +58,39 @@ class MessageService(object):
     @cherrypy.tools.json_in()
     @cherrypy.tools.json_out()
     def DELETE(self):
-        pass
+        """ Message deletion. Delete message according to supplied message and channel id.
+        to delete all messages, check if "all" argument passed in message_id parameter """
+        req_dict = cherrypy.request.json
+
+        if not self.valid_del_json(req_dict):
+            return msg_delete("JSON payload invalid", 1)
+        
+        q = {"channel_id": req_dict["channel_id"]}
+        if req_dict["message_id"] != "all":
+            q["message_id"] = req_dict["message_id"]
+
+        try:
+            self.mc.delete_many(q)
+        except:
+            return msg_delete("Error executing query", 1)
+        else:
+            return msg_delete("Messages deleted", 0)
 
     def valid_channel(self, channel_id):
         """ Check with channel service if channel id is valid"""
         pass
 
-
-    def valid_json(self, req_dict):
+    def valid_msg_json(self, req_dict):
         """ Checks all required fields present in message store request """
         if 'message' in req_dict:
             if all (k in req_dict['message'] for k in ("channel_id", "user_id", "body", "timestamp")):
                 return True
+        return False
+
+    def valid_del_json(self, req_dict):
+        """ Checks all required fields present in deletion request """
+        if all (k in req_dict for k in ("channel_id", "message_id")):
+            return True
         return False
 
 if __name__ == '__main__':
