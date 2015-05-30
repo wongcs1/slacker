@@ -1,4 +1,5 @@
 import cherrypy
+from msg_service_dicts import msg_response
 from bson.json_util import dumps
 from pymongo import MongoClient
 
@@ -14,23 +15,22 @@ class MessageService(object):
 
     @cherrypy.tools.json_out()
     def GET(self, message_id, channel_id):
-        """ Takes a channel anda message id. Checks validity of channel against channel service.
+        """ Takes a channel and a message id. Checks validity of channel against channel service.
         submits to data store and responds. TODO: Implement channel service check. """
 
-        r_root = {"msg_read_response": {"response_message": '', "response_code": 1 }}
-        r_msg_read = r_root["msg_read_response"]
-
         try:
-            msgs = self.mc.find({"message_id": {"$gt": int(message_id)}, "channel_id": int(channel_id)})
-            if msgs.count() == 0:
-                 r_msg_read["response_message"] = "No messages match query"
-            else:
-                r_msg_read["response_code"] = 0
-                r_msg_read["response_message"] = "Messages returned successfully"
-                r_root["messages"] = dumps(msgs)
+            msgs = self.mc.find({"message_id": {"$gt": int(message_id)}, 
+                "channel_id": int(channel_id)})
         except:
-            r_msg_read["response_message"] = "Cannot query database"
-        return r_root
+            r_msg = "Cannot query database"
+            return msg_response(r_msg, 1)
+        else:
+            if msgs.count() == 0:
+                 r_msg = "No messages match query"
+                 return msg_response(r_msg, 1)
+            else:
+                r_msg = "Messages returned successfully"
+                return msg_response(r_msg, 0, dumps(msgs))
 
     @cherrypy.tools.json_in()
     @cherrypy.tools.json_out()
