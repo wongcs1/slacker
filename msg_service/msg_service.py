@@ -39,8 +39,7 @@ class MessageService(object):
         msg_dict = req_dict["message"]
 
         if not self.valid_json(req_dict):
-            r_msg = "JSON payload invalid"
-            return msg_store(r_msg, 1)
+            return msg_store("JSON payload invalid", 1)
 
         try:
             self.mc.insert_one(msg_dict)
@@ -48,7 +47,7 @@ class MessageService(object):
         except:
             return msg_store("Error executing query", 1)
         else:
-            return msg_store("Message enterred successfully", 0, new_id)
+            return msg_store("Message entered successfully", 0, new_id)
 
     @cherrypy.tools.json_in()
     @cherrypy.tools.json_out()
@@ -59,6 +58,11 @@ class MessageService(object):
     @cherrypy.tools.json_out()
     def DELETE(self):
         pass
+
+    def valid_channel(self, channel_id):
+        """ Check with channel service if channel id is valid"""
+        pass
+
 
     def valid_json(self, req_dict):
         """ Checks all required fields present in message store request """
