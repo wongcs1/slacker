@@ -1,11 +1,12 @@
 import cherrypy
 import requests
-from msg_service_dicts import msg_response, msg_store
+import sys
+from msg_service_dicts import msg_response, msg_store, msg_delete
 from bson.json_util import dumps
 from pymongo import MongoClient
 lib_path = '..'
 sys.path.append(lib_path)
-from slacker_config import url, port
+import slacker_config
 
 class Root(object):
 
@@ -21,6 +22,9 @@ class MessageService(object):
     def GET(self, message_id, channel_id):
         """ Takes a channel and a message id. Checks validity of channel against channel service.
         submits to data store and responds. TODO: Implement channel service check. """
+     
+        if not self.valid_channel(int(channel_id)):
+            return msg_response("Channel invalid", 1)
 
         try:
             msgs = self.mc.find({"message_id": {"$gt": int(message_id)}, 
@@ -45,6 +49,9 @@ class MessageService(object):
         if not self.valid_msg_json(req_dict):
             return msg_store("JSON payload invalid", 1)
 
+        if not self.valid_channel(msg_dict["channel_id"]):
+            return msg_store("Channel invalid", 1)
+
         try:
             self.mc.insert_one(msg_dict)
             new_id = self.mc.count({"channel_id": msg_dict["channel_id"]}) + 1  # crude
@@ -60,33 +67,34 @@ class MessageService(object):
 
     @cherrypy.tools.json_in()
     @cherrypy.tools.json_out()
-    def DELETE(self):
+    def DELETE(self, message_id, channel_id):
         """ Message deletion. Delete message according to supplied message and channel id.
-        to delete all messages, check if "all" argument passed in message_id parameter """
-        req_dict = cherrypy.request.json
-
-        if not self.valid_del_json(req_dict):
-            return msg_delete("JSON payload invalid", 1)
+        to delete all messages, check if "all" argument passed in message_id parameter
+        Overload DELETE method for deleting a sepcific message vs all messages? """
         
-        q = {"channel_id": req_dict["channel_id"]}
-        if req_dict["message_id"] != "all":
-            q["message_id"] = req_dict["message_id"]
+        q = {"channel_id": int(channel_id)}
+
+        if message_id != "all":
+            q["message_id"] = int(message_id)
 
         try:
-            self.mc.delete_many(q)
+            result = self.mc.delete_many(q)
         except:
             return msg_delete("Error executing query", 1)
         else:
-            return msg_delete("Messages deleted", 0)
+            if result.deleted_count != 0:
+                return msg_delete("Messages deleted", 0)
+            return msg_delete("Query okay, no messages matched", 1)
 
     def valid_channel(self, channel_id):
         """ Check with channel service if channel id is valid"""
-        host = url["channels"]
-        hostport = port["channels"]
-
-        r = requests.get("http://{0}:{1}/?channel_id={2}".format(host, hostport, channel_id))
+        host = slacker_config.urls.url["channels"]
+        hostport = slacker_config.urls.port["channels"]
         
-        if r.json()['new_channel_response']['response_code'] == 0:
+        r = requests.get("{0}:{1}/?channel_id={2}".format(host, hostport, channel_id))
+        rjson = r.json()
+
+        if rjson["channel_read_response"]["response_code"] == 0:
             return True
         return False
 
@@ -95,12 +103,6 @@ class MessageService(object):
         if 'message' in req_dict:
             if all (k in req_dict['message'] for k in ("channel_id", "user_id", "body", "timestamp")):
                 return True
-        return False
-
-    def valid_del_json(self, req_dict):
-        """ Checks all required fields present in deletion request """
-        if all (k in req_dict for k in ("channel_id", "message_id")):
-            return True
         return False
 
 if __name__ == '__main__':
@@ -115,6 +117,6 @@ if __name__ == '__main__':
             }
     app = Root()
     app.messages = MessageService()
-    cherrypy.server.socket_host = url['messages']
-    cherrypy.server.socket_port = port['messages']
+    cherrypy.server.socket_host = 'meat.stewpot.nz'
+    cherrypy.server.socket_port = 8004
     cherrypy.quickstart(app, '/', conf)
