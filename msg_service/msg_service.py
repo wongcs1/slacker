@@ -1,4 +1,6 @@
 import cherrypy
+import requests
+from msg_service_dicts import msg_response, msg_store
 from bson.json_util import dumps
 from pymongo import MongoClient
 
@@ -14,53 +16,39 @@ class MessageService(object):
 
     @cherrypy.tools.json_out()
     def GET(self, message_id, channel_id):
-        """ Takes a channel anda message id. Checks validity of channel against channel service.
+        """ Takes a channel and a message id. Checks validity of channel against channel service.
         submits to data store and responds. TODO: Implement channel service check. """
 
-        r_root = {"msg_read_response": {"response_message": '', "response_code": 1 }}
-        r_msg_read = r_root["msg_read_response"]
-
         try:
-            msgs = self.mc.find({"message_id": {"$gt": int(message_id)}, "channel_id": int(channel_id)})
-            if msgs.count() == 0:
-                 r_msg_read["response_message"] = "No messages match query"
-            else:
-                r_msg_read["response_code"] = 0
-                r_msg_read["response_message"] = "Messages returned successfully"
-                r_root["messages"] = dumps(msgs)
+            msgs = self.mc.find({"message_id": {"$gt": int(message_id)}, 
+                "channel_id": int(channel_id)})
         except:
-            r_msg_read["response_message"] = "Cannot query database"
-        return r_root
+            return msg_response("Cannot query database", 1)
+        else:
+            if msgs.count() == 0:
+                 return msg_response("No messages match query", 1)
+            else:
+                return msg_response("Messages returned successfully", 0, dumps(msgs))
 
     @cherrypy.tools.json_in()
     @cherrypy.tools.json_out()
     def POST(self):
         """ Takes a new message store request, validates against channel service, validates json
-        contents, submits to database and responds. TODO: Refactor, implemented channel serv check"""
+        contents, submits to database and responds. TODO: Implement channel serv check"""
 
-        r_root = {"new_msg_response": {"response_code": 1, "response_message": "" }}
-        r_new = r_root["new_msg_response"]
+        req_dict = cherrypy.request.json
+        msg_dict = req_dict["message"]
 
-        root_dict = cherrypy.request.json
+        if not self.valid_msg_json(req_dict):
+            return msg_store("JSON payload invalid", 1)
 
-        if self.valid_json(root_dict):
-            msg_dict = root_dict["message"]
-            # Crude way to number messages for now
-            new_id = self.mc.count({"channel_id": msg_dict["channel_id"]}) + 1
-            msg_dict["message_id"] = new_id
-            
-            try:
-                self.mc.insert_one(msg_dict)
-                r_new["response_code"] = 0
-                r_new["response_message"] = "Message entered sucessfully"
-                r_new["message_id"] = new_id
-
-            except:
-                r_new["response_message"] = "Error executing query"
+        try:
+            self.mc.insert_one(msg_dict)
+            new_id = self.mc.count({"channel_id": msg_dict["channel_id"]}) + 1  # crude
+        except:
+            return msg_store("Error executing query", 1)
         else:
-            r_new["response_message"] = "JSON Payload Invalid"
-
-        return r_root
+            return msg_store("Message entered successfully", 0, new_id)
 
     @cherrypy.tools.json_in()
     @cherrypy.tools.json_out()
@@ -70,13 +58,39 @@ class MessageService(object):
     @cherrypy.tools.json_in()
     @cherrypy.tools.json_out()
     def DELETE(self):
+        """ Message deletion. Delete message according to supplied message and channel id.
+        to delete all messages, check if "all" argument passed in message_id parameter """
+        req_dict = cherrypy.request.json
+
+        if not self.valid_del_json(req_dict):
+            return msg_delete("JSON payload invalid", 1)
+        
+        q = {"channel_id": req_dict["channel_id"]}
+        if req_dict["message_id"] != "all":
+            q["message_id"] = req_dict["message_id"]
+
+        try:
+            self.mc.delete_many(q)
+        except:
+            return msg_delete("Error executing query", 1)
+        else:
+            return msg_delete("Messages deleted", 0)
+
+    def valid_channel(self, channel_id):
+        """ Check with channel service if channel id is valid"""
         pass
 
-    # Just check to make sure all fields are present for now
-    def valid_json(self, req_dict):
+    def valid_msg_json(self, req_dict):
+        """ Checks all required fields present in message store request """
         if 'message' in req_dict:
             if all (k in req_dict['message'] for k in ("channel_id", "user_id", "body", "timestamp")):
                 return True
+        return False
+
+    def valid_del_json(self, req_dict):
+        """ Checks all required fields present in deletion request """
+        if all (k in req_dict for k in ("channel_id", "message_id")):
+            return True
         return False
 
 if __name__ == '__main__':
