@@ -1,6 +1,10 @@
 __author__ = 'alexmcneill'
+import sys
 import cherrypy
 from pymongo import MongoClient
+lib_path = '..'
+sys.path.append(lib_path)
+import slacker_config
 
 
 class ChannelWebService:
@@ -12,21 +16,30 @@ class ChannelWebService:
         self.channel_collection = self.channel_db.channels
 
     @cherrypy.tools.json_out()
-    def GET(self, channel_id):
-        channel_id = int(channel_id)
+    def GET(self, channel_id= None):
+
         response_root = {"channel_read_response": {"response_message": '', "response_code": 1}}
         channel_read_response = response_root["channel_read_response"]
 
-        try:
-            channel_json = self.channel_collection.find_one({"_id": channel_id})
-            if channel_json is None:
-                channel_read_response["response_message"] = "No matching channel"
-            else:
-                channel_read_response["response_code"] = 0
-                channel_read_response["response_message"] = "Channel found"
-                response_root["channel"] = channel_json
-        except:
-            channel_read_response["response_message"] = "Unable to connect to database"
+        if channel_id is None:
+            channel_json = self.channel_collection.find()
+
+        else:
+
+            channel_id = int(channel_id)
+
+            try:
+                channel_json = self.channel_collection.find_one({"_id": channel_id})
+                if channel_json is None:
+                    channel_read_response["response_message"] = "No matching channel"
+                else:
+                    channel_read_response["response_code"] = 0
+                    channel_read_response["response_message"] = "Channel found"
+                    response_root["channel"] = channel_json
+            except:
+                channel_read_response["response_message"] = "Unable to connect to database"
+
+        return response_root
 
     @cherrypy.tools.json_out()
     @cherrypy.tools.json_in()
@@ -43,7 +56,7 @@ class ChannelWebService:
             if channel_json is not None:
                 new_channel_response["response_message"] = "There is already a channel by that name"
             else:
-                latest_channel_json = self.channel_collection.find_one({"$query":{},"$orderby":{"_id":-1}})
+                latest_channel_json = self.channel_collection.find_one({"$query": {}, "$orderby": {"_id": -1}})
                 new_channel_id = 0
                 if latest_channel_json is not None:
                     new_channel_id = latest_channel_json["_id"] + 1
@@ -58,6 +71,8 @@ class ChannelWebService:
         except:
             new_channel_response["response_message"] = "Unable to connect to database"
 
+        return response_root
+
 if __name__ == '__main__':
     conf = {
         "/": {
@@ -66,5 +81,6 @@ if __name__ == '__main__':
             "tools.response_headers.headers": [("Content-Type", "application/json")]
             }
         }
-    cherrypy.config.update({'server.socket_port': 8000})
+    cherrypy.config.update({'server.socket_port': slacker_config.urls.port['channels']})
+    cherrypy.server.socket_host = 'alexandermcneill.nz'
     cherrypy.quickstart(ChannelWebService(), '/', conf)
