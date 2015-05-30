@@ -115,5 +115,6 @@ if __name__ == '__main__':
             }
     app = Root()
     app.messages = MessageService()
-    cherrypy.server.socket_host = 'meat.stewpot.nz'
+    cherrypy.server.socket_host = url['messages']
+    cherrypy.server.socket_port = port['messages']
     cherrypy.quickstart(app, '/', conf)
