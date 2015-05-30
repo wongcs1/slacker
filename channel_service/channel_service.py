@@ -82,4 +82,5 @@ if __name__ == '__main__':
             }
         }
     cherrypy.config.update({'server.socket_port': slacker_config.urls.port['channels']})
+    cherrypy.server.socket_host = 'alexandermcneill.nz'
     cherrypy.quickstart(ChannelWebService(), '/', conf)
