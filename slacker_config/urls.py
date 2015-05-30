@@ -3,7 +3,7 @@ url = {
     'auth'           : 'http://localhost',
     'signup'       : 'http://localhost',
     'channels'       : 'http://localhost',
-    'messages'       : 'http://localhost',
+    'messages'       : 'http://meat.stewpot.nz',
     'msg_reader'     : 'http://localhost',
     'msg_writer'     : 'http://localhost',
 }
