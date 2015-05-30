@@ -2,7 +2,7 @@ url = {
     'user_directory' : 'http://localhost',
     'auth'           : 'http://localhost',
     'signup'       : 'http://localhost',
-    'channels'       : 'http://localhost',
+    'channels'       : 'http://alexandermcneill.nz',
     'messages'       : 'http://localhost',
     'msg_reader'     : 'http://localhost',
     'msg_writer'     : 'http://localhost',
