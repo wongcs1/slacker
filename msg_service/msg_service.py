@@ -3,6 +3,9 @@ import requests
 from msg_service_dicts import msg_response, msg_store
 from bson.json_util import dumps
 from pymongo import MongoClient
+lib_path = '..'
+sys.path.append(lib_path)
+from slacker_config import url, port
 
 class Root(object):
 
@@ -78,7 +81,14 @@ class MessageService(object):
 
     def valid_channel(self, channel_id):
         """ Check with channel service if channel id is valid"""
-        pass
+        host = url["channels"]
+        hostport = port["channels"]
+
+        r = requests.get("http://{0}:{1}/?channel_id={2}".format(host, hostport, channel_id))
+        
+        if r.json()['new_channel_response']['response_code'] == 0:
+            return True
+        return False
 
     def valid_msg_json(self, req_dict):
         """ Checks all required fields present in message store request """
