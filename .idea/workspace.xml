@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="9b5e4e2b-5483-4a5e-991d-0446f07b6518" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/channel_service/channel_service.py" afterPath="$PROJECT_DIR$/channel_service/channel_service.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="slacker.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -30,8 +29,8 @@
       <file leaf-file-name="channel_service.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/channel_service/channel_service.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.62666667" vertical-offset="765" max-vertical-offset="1905">
-              <caret line="98" column="12" selection-start-line="98" selection-start-column="12" selection-end-line="98" selection-end-column="12" />
+            <state vertical-scroll-proportion="0.58666664" vertical-offset="810" max-vertical-offset="1950">
+              <caret line="98" column="68" selection-start-line="98" selection-start-column="68" selection-end-line="98" selection-end-column="68" />
               <folding>
                 <element signature="e#27#37#0" expanded="true" />
               </folding>
@@ -52,11 +51,21 @@
       <file leaf-file-name="msg_service.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/msg_service/msg_service.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="750" max-vertical-offset="1920">
-              <caret line="80" column="18" selection-start-line="80" selection-start-column="12" selection-end-line="80" selection-end-column="18" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="720" max-vertical-offset="1920">
+              <caret line="82" column="46" selection-start-line="82" selection-start-column="37" selection-end-line="82" selection-end-column="46" />
               <folding>
                 <element signature="e#0#15#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="msg_service_dicts.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/msg_service/msg_service_dicts.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="510">
+              <caret line="22" column="25" selection-start-line="22" selection-start-column="13" selection-end-line="22" selection-end-column="25" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -635,14 +644,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/msg_service/msg_service_dicts.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="510">
-          <caret line="0" column="49" selection-start-line="0" selection-start-column="17" selection-end-line="0" selection-end-column="49" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/slacker_config/urls.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="375">
@@ -651,10 +652,18 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/msg_service/msg_service_dicts.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="510">
+          <caret line="22" column="25" selection-start-line="22" selection-start-column="13" selection-end-line="22" selection-end-column="25" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/msg_service/msg_service.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="750" max-vertical-offset="1920">
-          <caret line="80" column="18" selection-start-line="80" selection-start-column="12" selection-end-line="80" selection-end-column="18" />
+          <caret line="82" column="46" selection-start-line="82" selection-start-column="37" selection-end-line="82" selection-end-column="46" />
           <folding>
             <element signature="e#0#15#0" expanded="true" />
           </folding>
@@ -663,8 +672,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/channel_service/channel_service.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.62666667" vertical-offset="765" max-vertical-offset="1905">
-          <caret line="98" column="12" selection-start-line="98" selection-start-column="12" selection-end-line="98" selection-end-column="12" />
+        <state vertical-scroll-proportion="0.58666664" vertical-offset="810" max-vertical-offset="1950">
+          <caret line="98" column="68" selection-start-line="98" selection-start-column="68" selection-end-line="98" selection-end-column="68" />
           <folding>
             <element signature="e#27#37#0" expanded="true" />
           </folding>

@@ -96,6 +96,9 @@ class ChannelWebService:
                 r = requests.get("{0}:{1}/?channel_id={2}&message_id=all".format(host, host_port, channel_id))
                 response_json = r.json()
 
+                if response_json["del_response"]["response_code"] != 0:
+                    return delete_channel_response("Channel successfully deleted but, was unable to delete messages", 0)
+
             return delete_channel_response("Channel successfully deleted", 0)
 
         except ValueError:
@@ -118,5 +121,5 @@ if __name__ == '__main__':
     app.channels = ChannelWebService()
 
     cherrypy.config.update({'server.socket_port': slacker_config.urls.port['channels']})
-    cherrypy.server.socket_host = slacker_config.url.port['channels']
+    cherrypy.server.socket_host = slacker_config.urls.port['channels']
     cherrypy.quickstart(app, '/', conf)
