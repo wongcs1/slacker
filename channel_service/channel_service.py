@@ -1,6 +1,7 @@
 __author__ = 'alexmcneill'
 import sys
 import cherrypy
+import requests
 from channel_service_dicts import add_channel_response, delete_channel_response, read_channel_response
 from pymongo import MongoClient
 lib_path = '..'
@@ -78,8 +79,29 @@ class ChannelWebService:
             return add_channel_response("Unable to connect to database", 1)
 
     @cherrypy.tools.json_out()
-    def DELETE(self):
-        pass
+    def DELETE(self, channel_id):
+        try:
+            # Making use the input id is an int
+            channel_id = int(channel_id)
+
+            # Deleting channel
+            delete_result = self.channel_collection.delete_one({"_id": channel_id})
+
+            # Checking that a channel was deleted
+            if delete_result > 0:
+                # Requesting that the message service delete all messages associated with the channel
+                host = slacker_config.urls.url["messages"]
+                host_port = slacker_config.urls.port["messages"]
+
+                r = requests.get("{0}:{1}/?channel_id={2}&message_id=all".format(host, host_port, channel_id))
+                response_json = r.json()
+
+            return delete_channel_response("Channel successfully deleted", 0)
+
+        except ValueError:
+            return delete_channel_response("Invalid input", 1)
+        except:
+            return delete_channel_response("Unable to connect to the database", 1)
 
 if __name__ == '__main__':
     conf = {
